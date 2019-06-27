@@ -1,0 +1,158 @@
+package jframe;
+
+
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+import javax.swing.border.EtchedBorder;
+import javax.swing.border.TitledBorder;
+
+public class Goods extends JFrame implements ActionListener
+{
+
+    private JPanel p1, p2;
+    private JLabel l1, l2,l3;
+    private JTextField field1, field2,field3;
+    private JTextArea area;
+    private JScrollPane scroll;
+    private JButton add, clear, list, total;
+    private ArrayList<Item> Goods;
+    private double totalSum=0;
+    public Goods()
+    {
+        super("Стоки");
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        Container container = this.getContentPane();
+        p1 = new JPanel();
+        p1.setLayout(new GridLayout (3, 2));        
+        p1.setBorder(new EtchedBorder());
+        l1 = new JLabel("Име");
+        p1.add(l1);
+        field1 = new JTextField(10);
+        field1.addActionListener(this);
+        p1.add(field1);
+        l2 = new JLabel("ЕД.Цена");
+        p1.add(l2);
+        field2 = new JTextField(10);
+        p1.add(field2);
+        l3 = new JLabel("Количество");
+        p1.add(l3);
+        field3 = new JTextField(10);
+        p1.add(field3);
+        
+        
+        
+        
+        container.add(p1, BorderLayout.PAGE_START);
+        area = new JTextArea(5, 10);
+        scroll = new JScrollPane(area, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        container.add(scroll, BorderLayout.CENTER);
+        p2 = new JPanel();
+        add = new JButton("Добави");
+        add.addActionListener(this);
+        p2.add(add);
+        clear = new JButton("Изчисти");
+        clear.addActionListener(this);
+        p2.add(clear);
+        list = new JButton("Списък");
+        list.addActionListener(this);
+        p2.add(list); 
+        total = new JButton("Обща сума");
+        total.addActionListener(this);
+        p2.add(total);
+        container.add(p2, BorderLayout.PAGE_END);
+        Goods = new ArrayList<Item>();
+        this.setSize(500, 250);
+        this.setVisible(true);
+    }
+    public void actionPerformed(ActionEvent e)
+    {
+        Object source = e.getSource();
+        if(source == add)
+        {
+            try
+            {
+                Item newItem = new Item(field1.getText(), Double.parseDouble(field2.getText()),Integer.parseInt(field3.getText()));
+                Goods.add(newItem);
+               totalSum=totalSum+(newItem.getPrice()*newItem.getAmount());
+                area.setText("");
+                area.append("Добавена стока\n" + newItem.toString() + "\n");
+            }
+            catch(NumberFormatException ex)
+            {
+                area.setText("");
+                area.append("Грешка при въвеждане на данните!\n");
+            }
+        }
+        
+        else if (source == clear)
+        {
+            field1.setText("");
+            field2.setText("");
+            field3.setText("");
+            area.setText("");
+        }
+        
+        else if (source == field1)
+        {
+            String searchName = field1.getText();
+            boolean flag = false;
+            area.setText("");
+            area.append("Данни за " + searchName + "\n");
+            for (Item c: Goods)
+                if(c.getName().equals(searchName))
+                {
+                    flag = true;
+                    area.append(c.toString() + "\n");
+                }
+                
+                if (!flag)
+                {
+                    area.setText("");
+                    area.append("Липсват данни за " + searchName + "\n");
+                }
+        }
+        
+        else if (source == list)
+        {
+            area.setText("");
+            area.append("Списък на стоките\n");
+            for(Item c: Goods)
+                area.append(c.toString() + "\n");
+        }
+        
+        else if (source == total)
+        {
+            area.setText("");
+            area.append("Обща цена на стоките\n");
+         
+                area.append(totalSum + "\n");
+        }
+        
+        
+        
+    }
+    
+    public static void main(String[] args) 
+    {
+        SwingUtilities.invokeLater(new Runnable()
+        {
+            public void run()
+            {
+                new Goods();
+            }
+        });
+    }
+    
+}
